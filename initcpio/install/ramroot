@@ -4,6 +4,7 @@
 build() {
     add_binary mkfs.ext4
     add_binary zramctl
+    add_binary rsync
     add_binary setleds
     add_dir /local_root
     add_dir /zram_root
