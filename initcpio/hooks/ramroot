@@ -133,8 +133,7 @@ run_hook() {
     fi
 
     # get caps lock key state (num lock and scroll lock are available to be used also) 
-    keylock_states=$(setleds | grep "Current flags")
-    if [[ $keylock_states == *"CapsLock off"* ]]; then
+    if [ -z "$(setleds | grep "Current flags" | grep "CapsLock on")" ]; then
         # prompt for input:
         printf "\e[1;32m:: \e[1;37mLoad filesystem to zram? "
         if [ "$ps_default" = 'y' ]; then
