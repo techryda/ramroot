@@ -216,7 +216,7 @@ run_hook() {
         mount_path="${mount#*:}"
         mount "$mount_id" /local_root
         mkdir -p "/zram_root$mount_path"
-        rsync -aL --info=progress2 /local_root/. "/zram_root$mount_path"
+        rsync -ra --info=progress2 /local_root/. "/zram_root$mount_path"
         umount /local_root
     done
 
