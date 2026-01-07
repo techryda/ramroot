@@ -132,36 +132,41 @@ run_hook() {
         zram=$((zram+zram_max))
     fi
 
-    # prompt for input:
-    printf "\e[1;32m:: \e[1;37mLoad filesystem to zram? "
-    if [ "$ps_default" = 'y' ]; then
-        printf '[Y/n] \e[0m'
-    else
-        printf '[y/N] \e[0m'
-    fi
-    # visual countdown:
-    s=1
-    while [ $s -lt $ps_timeout ]; do
-        printf '.'
-        s=$((s+1))
-    done
-    printf ' '
-    s=0
-    while [ $s -lt $ps_timeout ]; do
-        read -rsn1 -t1 ps_input
-        if [ $? -eq 0 ]; then
-            s=$ps_timeout
+    # get caps lock key state (num lock and scroll lock are available to be used also) 
+    keylock_states=$(setleds | grep "Current flags")
+    if [[ $keylock_states == *"CapsLock off"* ]]; then
+        # prompt for input:
+        printf "\e[1;32m:: \e[1;37mLoad filesystem to zram? "
+        if [ "$ps_default" = 'y' ]; then
+            printf '[Y/n] \e[0m'
+        else
+            printf '[y/N] \e[0m'
         fi
-        printf '\b\b '
-        s=$((s+1))
-    done
-    ps_input="${ps_input:-$ps_default}"
-    if [ "$ps_input" != 'y' ] && [ "$ps_input" != 'Y' ]; then
-        printf '\e[1;37mno\e[0m\n'
-        return 0
+        # visual countdown:
+        s=1
+        while [ $s -lt $ps_timeout ]; do
+            printf '.'
+            s=$((s+1))
+        done
+        printf ' '
+        s=0
+        while [ $s -lt $ps_timeout ]; do
+            read -rsn1 -t1 ps_input
+            if [ $? -eq 0 ]; then
+                s=$ps_timeout
+            fi
+            printf '\b\b '
+            s=$((s+1))
+        done
+        ps_input="${ps_input:-$ps_default}"
+        if [ "$ps_input" != 'y' ] && [ "$ps_input" != 'Y' ]; then
+            printf '\e[1;37mno\e[0m\n'
+            return 0
+        fi
+        printf '\e[1;37myes\e[0m\n'
+    elif [[ $keylocks_state == *"CapsLock on"* ]]; then
+        printf '\e[1;34m=> \e[1;37mCaps Lock Detected ...\e[0m\n'
     fi
-    printf '\e[1;37myes\e[0m\n'
-
     printf '\e[1;34m=> \e[1;37mInitializing zram device ...\e[0m\n' "$mount_path"
 
     # make zram device:
