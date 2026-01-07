@@ -132,8 +132,9 @@ run_hook() {
         zram=$((zram+zram_max))
     fi
 
-    # get caps lock key state (num lock and scroll lock are available to be used also) 
-    if [ -z "$(setleds | grep "Current flags" | grep "CapsLock on")" ]; then
+    # load to ram based on caps lock key state (num lock/scroll lock could be used also) 
+    keylock_states=$(setleds | grep 'Current flags')
+    if [ "$(echo $keylock_states | grep 'CapsLock off')" ]; then
         # prompt for input:
         printf "\e[1;32m:: \e[1;37mLoad filesystem to zram? "
         if [ "$ps_default" = 'y' ]; then
@@ -163,8 +164,8 @@ run_hook() {
             return 0
         fi
         printf '\e[1;37myes\e[0m\n'
-    elif [[ $keylocks_state == *"CapsLock on"* ]]; then
-        printf '\e[1;34m=> \e[1;37mCaps Lock Detected ...\e[0m\n'
+    elif [ "$(echo $keylock_states | grep 'CapsLock on')" ]; then
+        printf '\e[1;34m=> \e[1;37mCaps Lock key Detected ...\e[0m\n'
     fi
     printf '\e[1;34m=> \e[1;37mInitializing zram device ...\e[0m\n' "$mount_path"
 
